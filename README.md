@@ -1,173 +1,60 @@
-# EmergEnv
-AI-powered OpenEnv simulation for emergency response coordination, enabling agents to make real-time hospital selection and resource allocation decisions.
-
-# 🚑 EmergEnv: Emergency Response Coordination Environment
-
-## 🧠 Overview
-
-EmergEnv is a real-world OpenEnv simulation environment designed to train and evaluate AI agents in handling time-critical emergency scenarios. The environment models the decision-making process involved in ambulance-to-hospital coordination, including hospital selection, ICU availability, and pre-arrival resource preparation.
-
-This project was built as part of a hackathon focused on developing AI training environments using standardized APIs.
-
+---
+title: Emergency Response Coordination Env
+emoji: 🚑
+colorFrom: red
+colorTo: blue
+sdk: docker
+pinned: false
 ---
 
-## 🎯 Problem Statement
+# Emergency Response Coordination Environment (ERCE)
 
-In real-world emergency situations, delays in hospital coordination can lead to critical outcomes. Ambulances often reach hospitals without prior preparation, leading to inefficiencies in treatment.
+## Overview & Real-World Motivation
+ERCE presents an OpenEnv-compatible orchestration layer simulating high-impact real-world triage mapping. Managing ambulances, intensive care logistics, and localized distance-time mapping provides a complex baseline testing how securely AI reasoning isolates the perfect safe pathways across competing variable demands securely.
 
-EmergEnv simulates this challenge and enables AI agents to:
+## Environment Architecture
 
-* Select the most appropriate hospital
-* Pre-notify required resources (ICU, operation theatre)
-* Optimize decisions under time constraints
+**Observation Schema:**
+- `patient_condition` (Accident, heart attack logic alongside bounds like low/medium/high severities and textual context).
+- `hospitals` (Available localized zones with granular flags covering ICU availability, active bed pools, exact distance logic mapped, and resource sub-arrays).
+- `active_task` (The runtime scenario bounds map).
 
----
+**Action Schema:**
+- `action_type`: Strictly (`choose_hospital`, `pre_notify`, `request_resources`)
+- `target_hospital_id`: String
+- `resources_requested`: Array
 
-## ⚙️ Environment Design
+## Tasks Execution Flow
+1. **Easy Task**: Patient mapped suffering minor accident. The AI strictly should parse minimum distance requirements over ICU variables seamlessly terminating the sequence quickly natively choosing `h2`.
+2. **Medium Task**: Patient suffers a massive heart attack requiring specialized ICU resources. The AI will learn it requires both alerting the specific location containing the ICU alongside executing the terminal hospital choice sequentially.
+3. **Hard Task**: Advanced burn context demanding specific trauma specializations logic bounds mapped. Agent needs to alert location, reserve extremely specific resources locally (`surgeon`), and then finish mapping routing securely validating 1.0 logic bounds exactly.
 
-The environment follows the OpenEnv standard interface:
+## Reward Engine Determinism
+Grading runs fully natively per episode:
+- Perfect hospital matches map out `+0.4`
+- Exact resource execution loops `+0.4`
+- Correct priority execution distances map `+0.2`
+- Unsafe allocations / mismatched hospital criteria dynamically restrict variables bound downwards securely via `-0.5` bounds tracking securely.
 
-* `reset()` → Initializes a new emergency scenario
-* `step(action)` → Processes agent action and returns observation, reward, done, info
-* `state()` → Returns current environment state
+## Local Test Build Operations
 
----
-
-## 📥 Observation Space
-
-Each episode provides structured input:
-
-```json
-{
-  "patient_condition": "heart_attack",
-  "severity": "high",
-  "distance": 8,
-  "available_hospitals": [
-    {"name": "A", "icu": 1, "beds": 2},
-    {"name": "B", "icu": 0, "beds": 1}
-  ]
-}
-```
-
----
-
-## ⚡ Action Space
-
-Agents can perform:
-
-```json
-{
-  "action_type": "choose_hospital | pre_notify | request_resources",
-  "target": "Hospital A"
-}
-```
-
----
-
-## 🎯 Tasks
-
-### 🟢 Easy
-
-* Select the correct hospital based on availability
-
-### 🟡 Medium
-
-* Select hospital + prepare necessary resources
-
-### 🔴 Hard
-
-* Full coordination: hospital selection, ICU allocation, and emergency preparation
-
----
-
-## 🏆 Reward Function
-
-* Correct hospital selection → +0.4
-* Correct resource preparation → +0.4
-* Efficient decisions → +0.2
-* Wrong decision → -0.3
-* Invalid/unsafe action → -0.5
-
----
-
-## 🧪 Grader
-
-Each task includes a deterministic grader that evaluates:
-
-* Decision correctness
-* Resource allocation
-* Efficiency
-
-Returns a score between **0.0 and 1.0**
-
----
-
-## 🌐 API Endpoints
-
-* `POST /reset`
-* `POST /step`
-* `GET /state`
-* `GET /tasks`
-* `GET /grader`
-* `GET /baseline`
-
----
-
-## 🤖 Baseline Agent
-
-A baseline inference script is included using the OpenAI API. It runs across all tasks and produces reproducible scores.
-
----
-
-## 🐳 Deployment
-
-The environment is containerized using Docker and deployed on Hugging Face Spaces.
-
-👉 Live Demo: (add your HF link here)
-
----
-
-## 🧱 Project Structure
-
-```
-project/
- ├── env.py
- ├── models.py
- ├── tasks/
- ├── graders/
- ├── app.py
- ├── baseline.py
- ├── openenv.yaml
- ├── Dockerfile
- └── README.md
-```
-
----
-
-## 🚀 Setup Instructions
-
+**Using Docker Container (Recommended)**:
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Run server
-uvicorn app:app --reload
+docker build -t erce-env .
+docker run -p 7860:7860 erce-env
 ```
 
----
+**Executing Local Source Validation (Standard Desktop)**:
+Ensure python > 3.9 boundaries logic.
+```bash
+pip install -r requirements.txt
+uvicorn app:app --host 0.0.0.0 --port 7860
+```
 
-## 🧠 Key Highlights
+## Running the OpenAI AI Baseline
 
-* Real-world emergency simulation
-* OpenEnv-compliant environment
-* Multi-step decision making
-* Deterministic evaluation system
-* Fully deployable with Docker
-
----
-
-## 🏁 Conclusion
-
-EmergEnv provides a structured and realistic environment for evaluating AI agents in critical decision-making scenarios, bridging the gap between theoretical AI models and real-world applications.
-
----
+Once the FastAPI mapping is serving correctly internally over port 7860 securely simply map OpenAI's valid execution boundary logic to see baseline output mappings run securely via API parameters dynamically mapping endpoints:
+```bash
+export OPENAI_API_KEY="sk-..."
+python baseline.py
+```

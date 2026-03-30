@@ -1,0 +1,27 @@
+name: ERCE (Emergency Response Coordination Environment)
+description: Real-world deterministic environment verifying complex health resource mappings and dispatch parameters via REST wrappers locally over OpenEnv rules.
+schema:
+  observation:
+    type: object
+    properties:
+      patient_condition:
+        type: object
+      hospitals:
+        type: array
+      current_time:
+        type: string
+      active_task:
+        type: string
+  action:
+    type: object
+    properties:
+      action_type:
+        type: string
+      target_hospital_id:
+        type: string
+      resources_requested:
+        type: array
+tasks:
+  - easy
+  - medium
+  - hard
